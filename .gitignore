@@ -1,0 +1,11 @@
+.DS_Store
+db/.DS_Store
+db/accounts/.DS_Store
+services/.DS_Store
+.idea
+node_modules
+launch.json
+coverage/
+.scannerwork
+.nyc_output
+

@@ -68,13 +68,19 @@ const fetchOrdersByCustomerId = async (req, res) => {
 };
 
 // Get delivery by ID
-const fetchDeliveriesByDeliveryId = async (req, res) => {
+const fetchOrderById = async (req, res) => {
     try {
-        const { deliveryId } = req.params;
-        const delivery = await axios.get(`${process.env.GATEWAY_URL}/delivery/${deliveryId}`);
-        res.status(200).json({ message: 'Delivery details retrieved successfully', delivery });
+        const { orderId } = req.params;
+        const orderDets = await axios.get(`${process.env.GATEWAY_URL}/orders/get-order/${orderId}`);
+        console.log(orderDets);
+        if (orderDets?.data?.deliveryId) {
+            const deliveryDets = await axios.get(`${process.env.GATEWAY_URL}/delivery/${orderDets?.data?.deliveryId}`);
+            console.log(deliveryDets);
+            orderDets.data.delivery = deliveryDets?.data || null
+        }
+        res.status(200).json({ message: 'Order details retrieved successfully', order: orderDets?.data });
     } catch (err) {
-        res.status(500).json({ message: 'Error getting delivery details', error: err.message });
+        res.status(500).json({ message: 'Error getting order details', error: err.message });
     }
 };
 
@@ -84,5 +90,5 @@ module.exports = {
     fetchUserProfile,
     fetchUserById,
     fetchOrdersByCustomerId,
-    fetchDeliveriesByDeliveryId,
+    fetchOrderById,
 };

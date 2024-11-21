@@ -15,11 +15,11 @@ router.post('/login', validate(loginSchema), userController.loginUser);
 // User Profile
 router.get('/profile', verifyToken, userController.fetchUserProfile);
 
-// Get customer orders
+// Get customer all orders
 router.get('/orders', verifyToken, userController.fetchOrdersByCustomerId);
 
-// Get customer deliveries
-router.get('/delivery/:deliveryId', verifyToken, userController.fetchDeliveriesByDeliveryId);
+// Get customer order by ID
+router.get('/orders/:orderId', verifyToken, userController.fetchOrderById);
 
 // Get customer by ID
 router.get('/:customerId', userController.fetchUserById);

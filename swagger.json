@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:3000/api/v1"
+      "url": "http://localhost:8083/api/v1"
     }
   ],
   "paths": {
@@ -466,34 +466,25 @@
         }
       }
     },
-    "/user/delivery/{deliveryId}": {
+    "/user/orders/{orderId}": {
       "get": {
-        "summary": "Get Delivery by ID",
-        "description": "Fetches details of a delivery by its delivery ID.",
-        "operationId": "fetchDeliveriesByDeliveryId",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "tags": [
-          "User"
-        ],
+        "summary": "Fetch Order Details by ID",
+        "description": "Retrieves the details of an order by its order ID, including related delivery details if available.",
+        "operationId": "fetchOrderById",
         "parameters": [
           {
-            "name": "deliveryId",
+            "name": "orderId",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer",
-              "example": 101
-            },
-            "description": "ID of the delivery to retrieve."
+              "type": "string",
+              "description": "The ID of the order to fetch"
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "Delivery details retrieved successfully",
+            "description": "Order details retrieved successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -501,31 +492,46 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "Delivery details retrieved successfully"
+                      "example": "Order details retrieved successfully"
                     },
-                    "delivery": {
+                    "order": {
                       "type": "object",
                       "properties": {
-                        "deliveryId": {
-                          "type": "integer",
-                          "example": 101
-                        },
                         "orderId": {
+                          "type": "string",
+                          "example": "12345"
+                        },
+                        "product": {
+                          "type": "string",
+                          "example": "Laptop"
+                        },
+                        "quantity": {
                           "type": "integer",
-                          "example": 101
+                          "example": 1
                         },
-                        "deliveryStatus": {
-                          "type": "string",
-                          "example": "delivered"
+                        "price": {
+                          "type": "number",
+                          "format": "float",
+                          "example": 999.99
                         },
-                        "deliveryDate": {
-                          "type": "string",
-                          "format": "date-time",
-                          "example": "2024-11-19T16:00:00Z"
-                        },
-                        "deliveryAddress": {
-                          "type": "string",
-                          "example": "123 Main Street, City, Country"
+                        "delivery": {
+                          "type": "object",
+                          "properties": {
+                            "deliveryId": {
+                              "type": "string",
+                              "example": "abc123"
+                            },
+                            "status": {
+                              "type": "string",
+                              "example": "Delivered"
+                            },
+                            "estimatedDeliveryDate": {
+                              "type": "string",
+                              "format": "date",
+                              "example": "2024-11-25"
+                            }
+                          },
+                          "nullable": true
                         }
                       }
                     }
@@ -534,44 +540,8 @@
               }
             }
           },
-          "400": {
-            "description": "Error retrieving delivery details",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Error getting delivery details"
-                    },
-                    "error": {
-                      "type": "string",
-                      "example": "Some error message"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Delivery not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Delivery not found"
-                    }
-                  }
-                }
-              }
-            }
-          },
           "500": {
-            "description": "Internal Server Error",
+            "description": "Internal Server Error - Error getting order details",
             "content": {
               "application/json": {
                 "schema": {
@@ -579,11 +549,11 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "Error getting delivery details"
+                      "example": "Error getting order details"
                     },
                     "error": {
                       "type": "string",
-                      "example": "Some error message"
+                      "example": "Unable to fetch order details"
                     }
                   }
                 }

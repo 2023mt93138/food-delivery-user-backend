@@ -1,3 +1,4 @@
+const axios = require('axios');
 const User = require('../models/user-model');
 const { hashPassword, comparePassword, generateAuthToken } = require('../utils/auth');
 
@@ -41,8 +42,47 @@ const fetchUserProfile = (req, res) => {
     res.status(200).json({ message: 'Success', user: req.user });
 };
 
+// Get customer by ID
+const fetchUserById = async (req, res) => {
+    try {
+        const { customerId } = req.params;
+        const user = await User.findByPk(customerId);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+        if (user?.status?.toLowerCase() !== 'active') return res.status(400).json({ message: 'User is not active' });
+        res.status(200).json({ message: 'Customer retrieved successfully', user });
+    } catch (err) {
+        res.status(500).json({ message: 'Error getting customer details', error: err.message });
+    }
+};
+
+// Get orders by customer-id
+const fetchOrdersByCustomerId = async (req, res) => {
+    try {
+        req.user = req.user.toJSON();
+        const { id } = req.user;
+        const orders = await axios.get(`${process.env.GATEWAY_URL}/orders/customer?customerId=${id}`);
+        res.status(200).json({ message: 'Orders retrieved successfully', orders });
+    } catch (err) {
+        res.status(500).json({ message: 'Error getting orders', error: err.message });
+    }
+};
+
+// Get delivery by ID
+const fetchDeliveriesByDeliveryId = async (req, res) => {
+    try {
+        const { deliveryId } = req.params;
+        const delivery = await axios.get(`${process.env.GATEWAY_URL}/delivery/${deliveryId}`);
+        res.status(200).json({ message: 'Delivery details retrieved successfully', delivery });
+    } catch (err) {
+        res.status(500).json({ message: 'Error getting delivery details', error: err.message });
+    }
+};
+
 module.exports = { 
     registerUser, 
     loginUser,
     fetchUserProfile,
+    fetchUserById,
+    fetchOrdersByCustomerId,
+    fetchDeliveriesByDeliveryId,
 };

@@ -1,91 +1,419 @@
 {
-    "openapi": "3.0.0",
-    "info": {
-      "title": "Food Delivery - User Service API",
-      "version": "1.0.0",
-      "description": "API for managing user registration, login, and profile details in the food delivery service."
-    },
-    "servers": [
-      {
-        "url": "https://23ab-2401-4900-1c54-7a06-d056-1d86-95d6-cfb3.ngrok-free.app/api/v1"
-      }
-    ],
-    "paths": {
-      "/user/register": {
-        "post": {
-          "summary": "Register a new User",
-          "description": "Create a new user with a given name, email, password, and role.",
-          "operationId": "registerUser",
-          "tags": ["User"],
-          "requestBody": {
-            "required": true,
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Food Delivery - User Service API",
+    "version": "1.0.0",
+    "description": "API for managing user registration, login, and profile details in the food delivery service."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api/v1"
+    }
+  ],
+  "paths": {
+    "/user/register": {
+      "post": {
+        "summary": "Register a new User",
+        "description": "Create a new user with a given name, email, password, and role.",
+        "operationId": "registerUser",
+        "tags": [
+          "User"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "John Doe"
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "john.doe@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "password123"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "customer"
+                    ],
+                    "example": "customer"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "active",
+                      "inactive"
+                    ],
+                    "example": "active"
+                  }
+                },
+                "required": [
+                  "name",
+                  "email",
+                  "password",
+                  "role"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered successfully",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "name": {
+                    "message": {
                       "type": "string",
-                      "example": "John Doe"
+                      "example": "User added successfully"
                     },
-                    "email": {
-                      "type": "string",
-                      "example": "john.doe@example.com"
-                    },
-                    "password": {
-                      "type": "string",
-                      "example": "password123"
-                    },
-                    "role": {
-                      "type": "string",
-                      "enum": ["customer"],
-                      "example": "customer"
-                    },
-                    "status": {
-                      "type": "string",
-                      "enum": ["active", "inactive"],
-                      "example": "active"
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "example": "John Doe"
+                        },
+                        "email": {
+                          "type": "string",
+                          "example": "john.doe@example.com"
+                        },
+                        "role": {
+                          "type": "string",
+                          "example": "user"
+                        },
+                        "status": {
+                          "type": "string",
+                          "example": "active"
+                        }
+                      }
                     }
-                  },
-                  "required": ["name", "email", "password", "role"]
+                  }
                 }
               }
             }
           },
-          "responses": {
-            "201": {
-              "description": "User registered successfully",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "message": {
-                        "type": "string",
-                        "example": "User added successfully"
-                      },
-                      "user": {
+          "400": {
+            "description": "Bad Request - User already exists"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/user/login": {
+      "post": {
+        "summary": "Login User",
+        "description": "Authenticate a user with email and password, and return a JWT token.",
+        "operationId": "loginUser",
+        "tags": [
+          "User"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "john.doe@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "password123"
+                  }
+                },
+                "required": [
+                  "email",
+                  "password"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User logged in successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "User logged in successfully"
+                    },
+                    "token": {
+                      "type": "string",
+                      "example": "jwt_token_here"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User email not found or incorrect password"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/user/profile": {
+      "get": {
+        "summary": "Fetch User Profile",
+        "description": "Get the details of the authenticated user.",
+        "operationId": "fetchUserProfile",
+        "tags": [
+          "User"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User profile fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "example": "John Doe"
+                        },
+                        "email": {
+                          "type": "string",
+                          "example": "john.doe@example.com"
+                        },
+                        "role": {
+                          "type": "string",
+                          "example": "user"
+                        },
+                        "status": {
+                          "type": "string",
+                          "example": "active"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Missing or invalid token"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/user/{customerId}": {
+      "get": {
+        "summary": "Fetch User by ID",
+        "description": "Fetches details of a user by their ID if the user is active.",
+        "operationId": "fetchUserById",
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "ID of the customer to retrieve"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Customer retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Customer retrieved successfully"
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "example": "John Doe"
+                        },
+                        "email": {
+                          "type": "string",
+                          "example": "john.doe@example.com"
+                        },
+                        "role": {
+                          "type": "string",
+                          "example": "customer"
+                        },
+                        "status": {
+                          "type": "string",
+                          "example": "active"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "example": "2024-11-19T17:35:34.000Z"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "example": "2024-11-19T17:35:34.000Z"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "User is not active",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "User is not active"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "User not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error retrieving user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error updating User"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "Some error message"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/orders": {
+      "get": {
+        "summary": "Get Orders by Customer ID",
+        "description": "Fetches all orders related to a specific customer by their customer ID.",
+        "operationId": "fetchOrdersByCustomerId",
+        "tags": [
+          "User"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Orders retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Orders retrieved successfully"
+                    },
+                    "orders": {
+                      "type": "array",
+                      "items": {
                         "type": "object",
                         "properties": {
-                          "id": {
+                          "orderId": {
                             "type": "integer",
-                            "example": 1
+                            "example": 101
                           },
-                          "name": {
+                          "orderStatus": {
                             "type": "string",
-                            "example": "John Doe"
+                            "example": "delivered"
                           },
-                          "email": {
+                          "orderDate": {
                             "type": "string",
-                            "example": "john.doe@example.com"
+                            "format": "date-time",
+                            "example": "2024-11-19T15:30:00Z"
                           },
-                          "role": {
-                            "type": "string",
-                            "example": "user"
-                          },
-                          "status": {
-                            "type": "string",
-                            "example": "active"
+                          "totalAmount": {
+                            "type": "number",
+                            "example": 45.99
                           }
                         }
                       }
@@ -93,144 +421,191 @@
                   }
                 }
               }
-            },
-            "400": {
-              "description": "Bad Request - User already exists"
-            },
-            "500": {
-              "description": "Server Error"
             }
-          }
-        }
-      },
-      "/user/login": {
-        "post": {
-          "summary": "Login User",
-          "description": "Authenticate a user with email and password, and return a JWT token.",
-          "operationId": "loginUser",
-          "tags": ["User"],
-          "requestBody": {
-            "required": true,
+          },
+          "400": {
+            "description": "Error retrieving orders",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "email": {
+                    "message": {
                       "type": "string",
-                      "example": "john.doe@example.com"
+                      "example": "Error getting orders"
                     },
-                    "password": {
+                    "error": {
                       "type": "string",
-                      "example": "password123"
-                    }
-                  },
-                  "required": ["email", "password"]
-                }
-              }
-            }
-          },
-          "responses": {
-            "200": {
-              "description": "User logged in successfully",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "message": {
-                        "type": "string",
-                        "example": "User logged in successfully"
-                      },
-                      "token": {
-                        "type": "string",
-                        "example": "jwt_token_here"
-                      }
+                      "example": "Some error message"
                     }
                   }
                 }
               }
-            },
-            "404": {
-              "description": "User email not found or incorrect password"
-            },
-            "500": {
-              "description": "Server Error"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error getting orders"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "Some error message"
+                    }
+                  }
+                }
+              }
             }
           }
         }
-      },
-      "/user/profile": {
-        "get": {
-          "summary": "Fetch User Profile",
-          "description": "Get the details of the authenticated user.",
-          "operationId": "fetchUserProfile",
-          "tags": ["User"],
-          "security": [
-            {
-              "BearerAuth": []
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "User profile fetched successfully",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "message": {
-                        "type": "string",
-                        "example": "Success"
-                      },
-                      "user": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "integer",
-                            "example": 1
-                          },
-                          "name": {
-                            "type": "string",
-                            "example": "John Doe"
-                          },
-                          "email": {
-                            "type": "string",
-                            "example": "john.doe@example.com"
-                          },
-                          "role": {
-                            "type": "string",
-                            "example": "user"
-                          },
-                          "status": {
-                            "type": "string",
-                            "example": "active"
-                          }
+      }
+    },
+    "/user/delivery/{deliveryId}": {
+      "get": {
+        "summary": "Get Delivery by ID",
+        "description": "Fetches details of a delivery by its delivery ID.",
+        "operationId": "fetchDeliveriesByDeliveryId",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "name": "deliveryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 101
+            },
+            "description": "ID of the delivery to retrieve."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Delivery details retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Delivery details retrieved successfully"
+                    },
+                    "delivery": {
+                      "type": "object",
+                      "properties": {
+                        "deliveryId": {
+                          "type": "integer",
+                          "example": 101
+                        },
+                        "orderId": {
+                          "type": "integer",
+                          "example": 101
+                        },
+                        "deliveryStatus": {
+                          "type": "string",
+                          "example": "delivered"
+                        },
+                        "deliveryDate": {
+                          "type": "string",
+                          "format": "date-time",
+                          "example": "2024-11-19T16:00:00Z"
+                        },
+                        "deliveryAddress": {
+                          "type": "string",
+                          "example": "123 Main Street, City, Country"
                         }
                       }
                     }
                   }
                 }
               }
-            },
-            "401": {
-              "description": "Unauthorized - Missing or invalid token"
-            },
-            "500": {
-              "description": "Server Error"
+            }
+          },
+          "400": {
+            "description": "Error retrieving delivery details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error getting delivery details"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "Some error message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Delivery not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Delivery not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Error getting delivery details"
+                    },
+                    "error": {
+                      "type": "string",
+                      "example": "Some error message"
+                    }
+                  }
+                }
+              }
             }
           }
-        }
-      }
-    },
-    "components": {
-      "securitySchemes": {
-        "BearerAuth": {
-          "type": "http",
-          "scheme": "bearer",
-          "bearerFormat": "JWT"
         }
       }
     }
-  }
-  
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ]
+}

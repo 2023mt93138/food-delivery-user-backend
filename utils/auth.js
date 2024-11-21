@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
-const secretKey = 'pQDZf/mFPknvG7+BXOlOJ8wREufrO7PZV/jmVWo5c8peB+w/U30CJZaEJvAfQKxv3aQFylUyjt4i4FXrw21KHQ==';
+const secretKey = process.env.JWT_SECRET_KEY;
 
 // Function to hash a password
 const hashPassword = async (password) => {

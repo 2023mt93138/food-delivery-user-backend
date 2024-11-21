@@ -1,12 +1,11 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/user-model');
 
-const secretKey = 'pQDZf/mFPknvG7+BXOlOJ8wREufrO7PZV/jmVWo5c8peB+w/U30CJZaEJvAfQKxv3aQFylUyjt4i4FXrw21KHQ==';
+const secretKey = process.env.JWT_SECRET_KEY;
 
 const verifyToken = async (req, res, next) => {
     const token = req.header('Authorization')?.replace('Bearer ', '');
     if (!token) return res.status(401).send('Access Denied');
-    console.log(token);
     try {
         const decoded = jwt.verify(token, secretKey);
         const userId = decoded.userId;

@@ -15,4 +15,13 @@ router.post('/login', validate(loginSchema), userController.loginUser);
 // User Profile
 router.get('/profile', verifyToken, userController.fetchUserProfile);
 
+// Get customer orders
+router.get('/orders', verifyToken, userController.fetchOrdersByCustomerId);
+
+// Get customer deliveries
+router.get('/delivery/:deliveryId', verifyToken, userController.fetchDeliveriesByDeliveryId);
+
+// Get customer by ID
+router.get('/:customerId', userController.fetchUserById);
+
 module.exports = router;

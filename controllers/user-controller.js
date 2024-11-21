@@ -1,4 +1,8 @@
 const axios = require('axios');
+const https = require('https');
+const agent = new https.Agent({  
+    rejectUnauthorized: false  // Bypass self-signed certificate validation
+});
 const User = require('../models/user-model');
 const { hashPassword, comparePassword, generateAuthToken } = require('../utils/auth');
 
@@ -60,7 +64,7 @@ const fetchOrdersByCustomerId = async (req, res) => {
     try {
         req.user = req.user.toJSON();
         const { id } = req.user;
-        const orders = await axios.get(`${process.env.GATEWAY_URL}/orders/customer?customerId=${id}`);
+        const orders = await axios.get(`${process.env.GATEWAY_URL}/orders/customer?customerId=${id}`, { httpsAgent: agent });
         res.status(200).json({ message: 'Orders retrieved successfully', orders });
     } catch (err) {
         res.status(500).json({ message: 'Error getting orders', error: err.message });
@@ -71,10 +75,10 @@ const fetchOrdersByCustomerId = async (req, res) => {
 const fetchOrderById = async (req, res) => {
     try {
         const { orderId } = req.params;
-        const orderDets = await axios.get(`${process.env.GATEWAY_URL}/orders/get-order/${orderId}`);
+        const orderDets = await axios.get(`${process.env.GATEWAY_URL}/orders/get-order/${orderId}`, { httpsAgent: agent });
         console.log(orderDets);
         if (orderDets?.data?.deliveryId) {
-            const deliveryDets = await axios.get(`${process.env.GATEWAY_URL}/delivery/${orderDets?.data?.deliveryId}`);
+            const deliveryDets = await axios.get(`${process.env.GATEWAY_URL}/delivery/${orderDets?.data?.deliveryId}`, { httpsAgent: agent });
             console.log(deliveryDets);
             orderDets.data.delivery = deliveryDets?.data || null
         }

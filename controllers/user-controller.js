@@ -65,7 +65,7 @@ const fetchOrdersByCustomerId = async (req, res) => {
         req.user = req.user.toJSON();
         const { id } = req.user;
         const orders = await axios.get(`${process.env.GATEWAY_URL}/orders/customer?customerId=${id}`, { httpsAgent: agent });
-        res.status(200).json({ message: 'Orders retrieved successfully', orders });
+        res.status(200).json({ message: 'Orders retrieved successfully', orders: orders?.data || [] });
     } catch (err) {
         res.status(500).json({ message: 'Error getting orders', error: err.message });
     }

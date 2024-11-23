@@ -78,7 +78,7 @@ const fetchOrderById = async (req, res) => {
         const orderDets = await axios.get(`${process.env.GATEWAY_URL}/orders/get-order/${orderId}`, { httpsAgent: agent });
         console.log(orderDets);
         if (orderDets?.data?.deliveryId) {
-            const deliveryDets = await axios.get(`${process.env.GATEWAY_URL}/delivery/${orderDets?.data?.deliveryId}`, { httpsAgent: agent });
+            const deliveryDets = await axios.get(`${process.env.GATEWAY_URL}/deliverys/${orderDets?.data?.deliveryId}`, { httpsAgent: agent });
             console.log(deliveryDets);
             orderDets.data.delivery = deliveryDets?.data || null
         }
